@@ -4,20 +4,18 @@
 
 //-----------------------------------
 int Menu_show(void);
-void Add_ab(int *count1, int *count2);
-void Del_ab(int *count1, int *count2);
-void List_ab(int count);
-void Search(int *count);
-void Find_name(int *count);
-void Find_surname(int *count);
-void Find_number(int *count);
+void Add_ab(int *number_in_list, int *count_abonents);
+void Del_ab(int *number_in_list, int *count_abonents);
+void List_ab(int count_abonents);
+void Search_abonent(int *count_abonents);
+int Read_inputstr(int input_string_parametr, int *number_in_list);
+void Find_value(int input_parametr, int *count_abonents);
 //-----------------------------------
 #define ADD	1	//добавить абонента в список
 #define LIST	2	//вывести список абонентов
 #define DEL	3	//удалить абонента из списка
 #define SEARCH	4	//поиск абонента в списке
 #define QUIT	5	//выход
-
 
 #define NAME	1
 #define SURNAME	2
@@ -31,15 +29,12 @@ struct phonebook
 };
 
 struct phonebook Abonent[30];
-
-
-
 //-----------------------------------
-int main (void)
+void main (void)
 {
 	int result = 0;
-	int count_list = 0;
-	int count_ab = 0;
+	int count_list = 0;//количество абонентов
+	int count_ab = 0; //номер абонента в списке
 
 	while(1)
 	{
@@ -56,22 +51,22 @@ int main (void)
 				Del_ab(&count_ab, &count_list);
 				break;
 			case SEARCH:
-				Search(&count_list);
+				Search_abonent(&count_list);
 				break;
 			case QUIT:
-				return(0);
+				return;
 			default:
 				printf("Error: Invalid menu item entered!\r\n");
 				break;
 		}
 	}
-	return(1);
-
+	return;
 }
 //---------------------------------------------
 int Menu_show(void)
 {
 	int key = 0;
+	int err_symb = 0;
 	unsigned char tmp[10];
 
 	printf("\t=====Menu====\r\n");
@@ -80,14 +75,7 @@ int Menu_show(void)
 	printf("Delete subscribers:\t\"3\" \r\n");
 	printf("Search subscribers:\t\"4\" \r\n");
 	printf("Quit:\t\t\t\"5\" \r\n");
-	printf("Please, select the menu item: ");
-
-//	do
-//	{
-//		key = getchar();
-//	}
-//	while ( (key == EOF) || (key == '\n') );
-
+ 	printf("Please, select the menu item: ");
 
 	while(1)
 	{
@@ -95,323 +83,293 @@ int Menu_show(void)
 
 		if (*tmp != EOF)
 		{
-			for (int i = 0; i < sizeof(tmp); i++)
-			if (tmp[i] == '\n')
-				tmp[i] = '\0';
-			key = atoi(tmp);
+			if ((tmp[1] == EOF)|| (tmp[1] == '\n'))
+			{
+				key = atoi(tmp);
+			}
+			else
+			{
+				do
+				{
+					err_symb = getchar();
+				}
+				while ((err_symb == EOF)||(err_symb != '\n'));
+				key = 0;
+			}
 			break;
 		}
 	}
-
 	return(key);
 }
 //-----------------------------------------------
-void Add_ab(int *count1, int *count2)
+void Add_ab(int *number_in_list, int *count_abonents)
 {
+	int result = 0;
 
-	printf("Please, enter the name of the subscriber: ");
-
-	while(1)
+	do
 	{
-		fgets(Abonent[*count1].name, sizeof(Abonent[*count1].name), stdin);
-		if (*Abonent[*count1].name != EOF)
-		{
-			for (int i = 0; i < sizeof(Abonent[*count1].name); i++)
-			if (Abonent[*count1].name[i] == '\n')
-				Abonent[*count1].name[i] = '\0';
-			break;
-		}
+		printf("Please, enter the name of the subscriber: ");
+		result = Read_inputstr(NAME, number_in_list);
 	}
+	while (!result);
+	result = 0;
 
-	printf("Please, enter the surname of the subscriber: ");
-
-	while(1)
+	do
 	{
-		fgets(Abonent[*count1].surname, sizeof(Abonent[*count1].surname), stdin);
-		if (*Abonent[*count1].surname != EOF)
-		{
-			for (int i = 0; i < sizeof(Abonent[*count1].surname); i++)
-			if (Abonent[*count1].surname[i] == '\n')
-				Abonent[*count1].surname[i] = '\0';
-			break;
-		}
+		printf("Please, enter the surname of the subscriber: ");
+		result = Read_inputstr(SURNAME, number_in_list);
 	}
+	while (!result);
+	result = 0;
 
-	printf("Please, enter the phone number of the subscriber: ");
-
-	while(1)
+	do
 	{
-		fgets(Abonent[*count1].number, sizeof(Abonent[*count1].number), stdin);
-		if (*Abonent[*count1].surname != EOF)
-		{
-			for (int i = 0; i < sizeof(Abonent[*count1].number); i++)
-			if (Abonent[*count1].number[i] == '\n')
-				Abonent[*count1].number[i] = '\0';
-			break;
-		}
+		printf("Please, enter the phonenumber of the subscriber: ");
+		result = Read_inputstr(NUMBER, number_in_list);
 	}
-
-	if ((*Abonent[*count1].name != '\0')||(*Abonent[*count1].surname != '\0')||(*Abonent[*count1].number != '\0'))
+	while (!result);
+	if ((*Abonent[*number_in_list].name != '\0')||(*Abonent[*number_in_list].surname != '\0')||(*Abonent[*number_in_list].number != '\0'))
 	{
-		if ((*count2) < sizeof(Abonent)/sizeof(Abonent[0]))
-			(*count2)++;
-		(*count1)++;
-		if((*count1) >= sizeof(Abonent)/sizeof(Abonent[0]))
-			(*count1) = 0;
+		if ((*count_abonents) < sizeof(Abonent)/sizeof(Abonent[0]))
+			(*count_abonents)++;
+		(*number_in_list)++;
+		if((*number_in_list) >= sizeof(Abonent)/sizeof(Abonent[0]))
+			(*number_in_list) = 0;
 	}
 	return;
-
 }
 //-----------------------------------------------
-void Del_ab(int *count1, int *count2)
+int Read_inputstr(int input_string_parametr, int *number_in_list)
+{
+	char flag = 0;
+	char tmp = 0;
+	unsigned char inputstr[30] = {};
+
+	while(1)
+	{
+		fgets(inputstr, sizeof(inputstr), stdin);
+		if (*inputstr != EOF)
+		{
+			for (int i = 0; i < sizeof(inputstr); i++)
+			if (inputstr[i] == '\n')
+			{
+				inputstr[i] = '\0';
+				flag++;
+			}
+			break;
+		}
+	}
+
+	if (!flag)
+	{
+		do
+		{
+			tmp = getchar();
+		}
+		while ((tmp == EOF)||(tmp != '\n'));
+		printf("Incorrect number of symbols entered! Should be less than 30!\n ");
+		return(0);
+	}
+	switch (input_string_parametr)
+	{
+		case NAME:
+			memcpy(Abonent[*number_in_list].name, inputstr, sizeof(Abonent[*number_in_list].name));
+			break;
+		case SURNAME:
+			memcpy(Abonent[*number_in_list].surname, inputstr, sizeof(Abonent[*number_in_list].surname));
+			break;
+		case NUMBER:
+			memcpy(Abonent[*number_in_list].number, inputstr, sizeof(Abonent[*number_in_list].number));
+			break;
+	}
+	return(1);
+}
+
+//-----------------------------------------------
+void Del_ab(int *number_in_list, int *count_abonents)
 {
 	int sub_num;
 	unsigned char tmp[10];
 
-	if (*count2)//если в списке есть абоненты
-	{
-		printf("Please, enter the subscriber's number to delete: ");
-
-		while(1)
-		{
-			fgets(tmp,sizeof(tmp),stdin);
-			if (*tmp != EOF)
-			{
-				for (int i = 0; i < sizeof(tmp); i++)
-				if (tmp[i] == '\n')
-					tmp[i] = '\0';
-				sub_num = atoi(tmp);
-				break;
-			}
-		}
-
-		if((sub_num > 0)&&(sub_num <= (*count2)))
-		{
-			sub_num--;
-			memset(Abonent[sub_num].name, '\0', sizeof(Abonent[sub_num].name));
-			memset(Abonent[sub_num].surname, '\0', sizeof(Abonent[sub_num].surname));
-			memset(Abonent[sub_num].number, '\0', sizeof(Abonent[sub_num].number));
-			for (int i = sub_num; i < *count2; i++)
-			{
-				memcpy(Abonent[i].name, Abonent[i + 1].name, sizeof(Abonent[i + 1].name));
-				memcpy(Abonent[i].surname, Abonent[i + 1].surname, sizeof(Abonent[i + 1].surname));
-				memcpy(Abonent[i].number, Abonent[i + 1].number, sizeof(Abonent[i + 1].number));
-			}
-			(*count1)--;
-			(*count2)--;
-		}
-		else
-		{
-			printf("Error: Incorrect subscriber's number entered!\r\n");
-		}
-	}
-	else
+	if (!(*count_abonents))//если в списке нет абонентов
 	{
 		printf("There are no subscribers in the list to delete!\r\n");
+		return;
 	}
 
-	return;
-}
-//-----------------------------------------------
-void List_ab(int count)
-{
-	if(count)//если в списке есть абоненты
+	printf("Please, enter the subscriber's rownumber to delete: ");
+	while(1)
 	{
-		for(int i = 0; i < count; i++)
+		fgets(tmp,sizeof(tmp),stdin);
+		if (*tmp != EOF)
 		{
-			printf("%d \t Name: %s \t\t\t Surname: %s \t\t\t Phone number: %s \r\n", i+1, Abonent[i].name,\
-				 Abonent[i].surname, Abonent[i].number);
+			for (int i = 0; i < sizeof(tmp); i++)
+			if (tmp[i] == '\n')
+				tmp[i] = '\0';
+			sub_num = atoi(tmp);
+			break;
 		}
+	}
+
+	if((sub_num > 0)&&(sub_num <= (*count_abonents)))
+	{
+		sub_num--;
+		memset(Abonent[sub_num].name, '\0', sizeof(Abonent[sub_num].name));
+		memset(Abonent[sub_num].surname, '\0', sizeof(Abonent[sub_num].surname));
+		memset(Abonent[sub_num].number, '\0', sizeof(Abonent[sub_num].number));
+		for (int i = sub_num; i < *count_abonents; i++)
+		{
+			memcpy(Abonent[i].name, Abonent[i + 1].name, sizeof(Abonent[i + 1].name));
+			memcpy(Abonent[i].surname, Abonent[i + 1].surname, sizeof(Abonent[i + 1].surname));
+			memcpy(Abonent[i].number, Abonent[i + 1].number, sizeof(Abonent[i + 1].number));
+		}
+		(*number_in_list)--;
+		(*count_abonents)--;
 	}
 	else
 	{
-		printf("There are no subscribers to list!\r\n");
+		printf("Error: Incorrect subscriber's rownumber entered!\r\n");
 	}
 	return;
 }
 //-----------------------------------------------
-void Search(int *count)
+void List_ab(int count_abonents)
+{
+	if(!count_abonents)//если в списке нет абонентов
+	{
+		printf("There are no subscribers to list!\r\n");
+		return;
+	}
+	for(int i = 0; i < count_abonents; i++)
+	{
+		printf("%d \t Name: %s \t\t\t Surname: %s \t\t\t Phone number: %s \r\n", i+1, Abonent[i].name,\
+			 Abonent[i].surname, Abonent[i].number);
+	}
+	return;
+}
+//-----------------------------------------------
+void Search_abonent(int *count_abonents)
 {
 	int parametr = 0;
 	char tmp[10];
 
-	if(count)
-	{
-		printf("\r\nPlease, enter the parametr for search: \r\n");
-		printf("Name:\t\t\"1\" \r\n");
-		printf("Surname:\t\"2\" \r\n");
-		printf("Phone number:\t\"3\" \r\n");
-
-		while(1)
-		{
-			fgets(tmp,sizeof(tmp),stdin);
-			if (*tmp != EOF)
-			{
-				for (int i = 0; i < sizeof(tmp); i++)
-				if (tmp[i] == '\n')
-					tmp[i] = '\0';
-				parametr = atoi(tmp);
-				break;
-			}
-		}
-
-		switch (parametr)
-		{
-			case NAME:
-				Find_name(&(*count));
-				break;
-			case SURNAME:
-				Find_surname(&(*count));
-				break;
-			case NUMBER:
-				Find_number(&(*count));
-				break;
-			default:
-				printf("Error: Invalid parametr entered!\r\n");
-				break;
-		}
-
-	}
-	else
+	if(!(*count_abonents))
 	{
 		printf("There are no subscribers in the list for search!\r\n");
+		return;
 	}
-	return;
-}
-//---------------------------------------------------------
-void Find_name(int *count)
-{
-	char Name[30] = {};
-	char flag = 0;
-	int size = 0;
 
-	printf("\r\nPlease, enter the name for search: ");
-
+	printf("\r\nPlease, enter the parametr for search: \r\n");
+	printf("Name:\t\t\"1\" \r\n");
+	printf("Surname:\t\"2\" \r\n");
+	printf("Phone number:\t\"3\" \r\n");
 
 	while(1)
 	{
-		fgets(Name,sizeof(Name),stdin);
-
-		if (*Name != EOF)
+		fgets(tmp,sizeof(tmp),stdin);
+		if (*tmp != EOF)
 		{
-			for (int i = 0; i < sizeof(Name); i++)
+			for (int i = 0; i < sizeof(tmp); i++)
+			if (tmp[i] == '\n')
+				tmp[i] = '\0';
+			parametr = atoi(tmp);
+			break;
+		}
+	}
+	switch (parametr)
+	{
+		case NAME:
+			//Find_name(&(*count));
+			printf("\r\nPlease, enter the name for search: ");
+			Find_value(NAME, (&(*count_abonents)));
+			break;
+		case SURNAME:
+			//Find_surname(&(*count));
+			printf("\r\nPlease, enter the surname for search: ");
+			Find_value(SURNAME, (&(*count_abonents)));
+			break;
+		case NUMBER:
+			//Find_number(&(*count));
+			printf("\r\nPlease, enter the phone number for search: ");
+			Find_value(NUMBER, (&(*count_abonents)));
+			break;
+		default:
+			printf("Error: Invalid parametr entered!\r\n");
+			break;
+	}
+	return;
+}
+//-------------------------------------------------------------------------
+void Find_value(int input_parametr, int *count_abonents)
+{
+	char parametr[30] = {};
+	char flag = 0;
+	int size = 0;
 
-			if (Name[i] == '\n')
+	while(1)
+	{
+		fgets(parametr,sizeof(parametr),stdin);
+
+		if (*parametr != EOF)
+		{
+			for (int i = 0; i < sizeof(parametr); i++)
+
+			if (parametr[i] == '\n')
 			{
-				Name[i] = '\0';
+				parametr[i] = '\0';
 				size = i;
 			}
 			break;
 		}
 	}
-
-
-	for (int i = 0; i <= *count; i++)
+	switch (input_parametr)
 	{
-
-		if ((memcmp(Abonent[i].name, Name, sizeof(Name))) == 0)
-		{
-			flag = 1;
-			printf("%d \t Name: %s \t\t\t Surname: %s \t\t\t Phone number: %s \r\n", i+1, Abonent[i].name,\
-				 Abonent[i].surname, Abonent[i].number);
-		}
-	}
-	if (!flag)
-	{
-		printf("There are no subscribers with the set name! \r\n");
-	}
-	return;
-
-}
-//---------------------------------------------------------
-
-void Find_surname(int *count)
-{
-	char Surname[30] = {};
-	char flag = 0;
-	int size = 0;
-
-	printf("\r\nPlease, enter the surname for search: ");
-
-
-	while(1)
-	{
-		fgets(Surname,sizeof(Surname),stdin);
-
-		if (*Surname != EOF)
-		{
-			for (int i = 0; i < sizeof(Surname); i++)
-
-			if (Surname[i] == '\n')
+		case NAME:
+			for (int i = 0; i <= *count_abonents; i++)
 			{
-				Surname[i] = '\0';
-				size = i;
+				if ((memcmp(Abonent[i].name, parametr, sizeof(parametr))) == 0)
+				{
+					flag = 1;
+					printf("%d \t Name: %s \t\t\t Surname: %s \t\t\t Phone number: %s \r\n", i+1, Abonent[i].name,\
+						 Abonent[i].surname, Abonent[i].number);
+				}
+			}
+			if (!flag)
+			{
+				printf("There are no subscribers with the set name! \r\n");
+			}
+			break;
+		case SURNAME:
+			for (int i = 0; i <= *count_abonents; i++)
+			{
+				if ((memcmp(Abonent[i].surname, parametr, sizeof(parametr))) == 0)
+				{
+					flag = 1;
+					printf("%d \t Name: %s \t\t\t Surname: %s \t\t\t Phone number: %s \r\n", i+1, Abonent[i].name,\
+						 Abonent[i].surname, Abonent[i].number);
+				}
+			}
+			if (!flag)
+			{
+				printf("There are no subscribers with the set surname! \r\n");
+			}
+			break;
+		case NUMBER:
+			for (int i = 0; i <= *count_abonents; i++)
+			{
+				if ((memcmp(Abonent[i].number, parametr, sizeof(parametr))) == 0)
+				{
+					flag = 1;
+					printf("%d \t Name: %s \t\t\t Surname: %s \t\t\t Phone number: %s \r\n", i+1, Abonent[i].name,\
+						 Abonent[i].surname, Abonent[i].number);
+				}
+			}
+			if (!flag)
+			{
+				printf("There are no subscribers with the set phone number! \r\n");
 			}
 			break;
 		}
-	}
-
-
-	for (int i = 0; i <= *count; i++)
-	{
-
-		if ((memcmp(Abonent[i].surname, Surname, sizeof(Surname))) == 0)
-		{
-			flag = 1;
-			printf("%d \t Name: %s \t\t\t Surname: %s \t\t\t Phone number: %s \r\n", i+1, Abonent[i].name,\
-				 Abonent[i].surname, Abonent[i].number);
-		}
-	}
-	if (!flag)
-	{
-		printf("There are no subscribers with the set surname! \r\n");
-	}
 	return;
-
-}
-//---------------------------------------------------------
-void Find_number(int *count)
-{
-	char Number[30] = {};
-	char flag = 0;
-	int size = 0;
-
-	printf("\r\nPlease, enter the number for search: ");
-
-
-	while(1)
-	{
-		fgets(Number,sizeof(Number),stdin);
-
-		if (*Number != EOF)
-		{
-			for (int i = 0; i < sizeof(Number); i++)
-
-			if (Number[i] == '\n')
-			{
-				Number[i] = '\0';
-				size = i;
-			}
-			break;
-		}
-	}
-
-
-	for (int i = 0; i <= *count; i++)
-	{
-
-		if ((memcmp(Abonent[i].number, Number, sizeof(Number))) == 0)
-		{
-			flag = 1;
-			printf("%d \t Name: %s \t\t\t Surname: %s \t\t\t Phone number: %s \r\n", i+1, Abonent[i].name,\
-				 Abonent[i].surname, Abonent[i].number);
-		}
-	}
-	if (!flag)
-	{
-		printf("There are no subscribers with the set number! \r\n");
-	}
-	return;
-
 }
 //---------------------------------------------------------
